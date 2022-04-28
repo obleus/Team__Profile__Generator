@@ -1,5 +1,14 @@
 const inquirer = require('inquirer');
-const { writeFile, copyFile } = require('./utils/generate-site.js');
+const Manager = require('./lib/Manager');
+const Engineer = require('./lib/Engineer');
+const Intern = require('./lib/Intern');
+const generateSite = require('./src/generate-site.js');
+const fs = require("fs");
+const path = require("path");
+const OUTPUT_DIR = path.resolve(__dirname, "output")
+const outputPath = path.join(OUTPUT_DIR, "team.html");
+const teamMembers = [];
+
 const promptManager = () => {
     return inquirer.prompt([
         {
@@ -18,12 +27,12 @@ const promptManager = () => {
         {
             type: 'input',
             name: 'employeeID',
-            message: 'Enter  employee ID (Required)',
+            message: 'Enter your employee ID (Required)',
             validate: employeeId => {
                 if (employeeId) {
                     return true;
                 } else {
-                    console.log('Please enter employee ID!');
+                    console.log('Please enter your employee ID!');
                     return false;
                 }
             }
@@ -31,12 +40,12 @@ const promptManager = () => {
         {
             type: 'input',
             name: 'email',
-            message: 'Enter email address (Required)',
+            message: 'Enter your email address (Required)',
             validate: email => {
                 if (email) {
                     return true;
                 } else {
-                    console.log('Please enter  email address!');
+                    console.log('Please enter your email address!');
                     return false;
                 }
             }
@@ -49,184 +58,188 @@ const promptManager = () => {
                 if (officeNumber) {
                     return true;
                 } else {
-                    console.log('Please enter  office number!');
+                    console.log('Please enter your office number!');
                     return false;
                 }
             }
-        
         },
+    ]).then(answers => {
+        console.log(answers);
+        const manager = new Manager(answers.name, answers.employeeID, answers.email, answers.officeNumber);
+        teamMembers.push(manager);
+        promptMenu();
+    })
+};
+
+const promptMenu = () => {
+    return inquirer.prompt([
         {
             type: 'list',
             name: 'menu',
             message: 'Please select which option you would like to continue with:',
             choices: ['add an engineer', 'add an intern', 'finish building my team']
-        }
-    ]);
+        }])
+        .then(userChoice => {
+            switch (userChoice.menu) {
+                case "add an engineer":
+                    promptEngineer();
+                    break;
+                case "add an intern":
+                    promptIntern();
+                    break;
+                default:
+                    buildTeam();
+            }
+        });
 };
-const promptEmployee = employeeData => {
+
+const promptEngineer = () => {
     console.log(`
     ===============
-    Add a New Employee
+    Add a New Engineer
     ===============
     `);
-// If there's no 'employees' array property, create one
-if (!employeeData.employees) {
-    employeeData.employees = [];
-}
-return inquirer.prompt([
-    {
-        type: 'input',
-        name: 'engineerName',
-        message: 'What is the name of engineer? (Required)',
-        validate: engineerName => {
-            if (engineerName) {
-                return true;
-            } else {
-                console.log('Please enter the name of engineer!');
-                return false;
-            }
-        }
-    },
-    {
-        type: 'input',
-        name: 'employeeID',
-        message: 'Enter  employee ID (Required)',
-        validate: employeeId => {
-            if (employeeId) {
-                return true;
-            } else {
-                console.log('Please enter employee ID!');
-                return false;
-            }
-        }
-    },
-    {
-        type: 'input',
-        name: 'email',
-        message: 'Enter email address (Required)',
-        validate: email => {
-            if (email) {
-                return true;
-            } else {
-                console.log('Please enter  email address!');
-                return false;
-            }
-        }
-    },
-    {
-        type: 'input',
-        name: 'githubUsername',
-        message: 'Enter  Github username. (Required)',
-        validate: githubUsername => {
-            if (githubUsername) {
-                return true;
-            } else {
-                console.log('Please enter Github username!');
-                return false;
-            }
-        }
-    }
-]).then(employeeData => {
-    employeeData.employees.push(employeeData);
-    if (employeeData.confirmAddEmployee) {
-        return promptProject(employeeData);
-    } else {
-        return employeeData;
-    }
-});
-};
-const promptIntern = internData => {
-console.log(`
-===============
-Add a New Intern
-===============
-`);
-if (!internData.interns) {
-    internData.interns = [];
-}
 
-return inquirer.prompt([
-    {
-        type: 'input',
-        name: 'internName',
-        message: 'What is the name of the intern? (Required)',
-        validate: internName => {
-            if (internName) {
-                return true;
-            } else {
-                console.log('Please enter the name of the intern!');
-                return false;
+    return inquirer.prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is the name of engineer? (Required)',
+            validate: engineerName => {
+                if (engineerName) {
+                    return true;
+                } else {
+                    console.log('Please enter the name of engineer!');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'employeeID',
+            message: 'Enter your employee ID (Required)',
+            validate: employeeId => {
+                if (employeeId) {
+                    return true;
+                } else {
+                    console.log('Please enter your employee ID!');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'email',
+            message: 'Enter your email address (Required)',
+            validate: email => {
+                if (email) {
+                    return true;
+                } else {
+                    console.log('Please enter your email address!');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'githubUsername',
+            message: 'Enter your Github username. (Required)',
+            validate: githubUsername => {
+                if (githubUsername) {
+                    return true;
+                } else {
+                    console.log('Please enter your Github username!');
+                    return false;
+                }
             }
         }
-    },
-    {
-        type: 'input',
-        name: 'employeeID',
-        message: 'Enter employee ID (Required)',
-        validate: employeeId => {
-            if (employeeId) {
-                return true;
-            } else {
-                console.log('Please enter  employee ID!');
-                return false;
-            }
-        }
-    },
-    {
-        type: 'input',
-        name: 'email',
-        message: 'Enter your email address (Required)',
-        validate: email => {
-            if (email) {
-                return true;
-            } else {
-                console.log('Please enter your email address!');
-                return false;
-            }
-        }
-    },
-    {
-        type: 'input',
-        name: 'githubUsername',
-        message: 'Enter your Github username. (Required)',
-        validate: githubUsername => {
-            if (githubUsername) {
-                return true;
-            } else {
-                console.log('Please enter your Github username!');
-                return false;
-            }
-        }
-    }
-]).then(internData => {
-    internData.interns.push(internData);
-    if (internData.confirmAddIntern) {
-        return promptIntern(internData);
-    } else {
-        return internData;
-    }
-});
+    ]).then(answers => {
+        console.log(answers);
+        const engineer = new Engineer(answers.name, answers.employeeID, answers.email, answers.githubUsername);
+        teamMembers.push(engineer);
+        promptMenu();
+    })
 };
 
-promptManager()
-.then(promptEmployee)
-.then(employeeData => {
-    return generatePage(employeeData);
-})
-.then(promptInter)
-.then(internData => {
-    return generatePage(internData);
-})
-.then(pageHTML => {
-    return writeFile(pageHTML);
-})
-.then(writeFileResponse => {
-    console.log(writeFileResponse);
-    return copyFile();
-})
-.then(copyFileResponse => {
-    console.log(copyFileResponse);
-})
-.catch(err => {
-    console.log(err);
-});
+const promptIntern = () => {
+    console.log(`
+    ===============
+    Add a New Intern
+    ===============
+    `);
+
+    return inquirer.prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is the name of the intern? (Required)',
+            validate: internName => {
+                if (internName) {
+                    return true;
+                } else {
+                    console.log('Please enter the name of the intern!');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'employeeID',
+            message: 'Enter your employee ID (Required)',
+            validate: employeeId => {
+                if (employeeId) {
+                    return true;
+                } else {
+                    console.log('Please enter your employee ID!');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'email',
+            message: 'Enter your email address (Required)',
+            validate: email => {
+                if (email) {
+                    return true;
+                } else {
+                    console.log('Please enter your email address!');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'school',
+            message: 'Enter your school name. (Required)',
+            validate: githubUsername => {
+                if (githubUsername) {
+                    return true;
+                } else {
+                    console.log('Please enter your school name!');
+                    return false;
+                }
+            }
+        }
+    ]).then(answers => {
+        console.log(answers);
+        const intern = new Intern(answers.name, answers.employeeID, answers.email, answers.school);
+        teamMembers.push(intern);
+        promptMenu();
+    })
+};
+
+const buildTeam = () => {
+    console.log(`
+    ===============
+    Finished building my team!
+    ===============
+    `);
+
+    if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR)
+    }
+    fs.writeFileSync(outputPath, generateSite(teamMembers), "utf-8");
+}
+
+promptManager(); 

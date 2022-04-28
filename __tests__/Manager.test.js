@@ -23,3 +23,7 @@ test('test if we can get the email from the getEmail() method', () => {
 test('test if we can get the office number from the getOfficeNumber() method', () => {
     expect(manager.getOfficeNumber()).toBe('123');
 });
+
+test('test if we can get the role from the getRole() method', () => {
+    expect(manager.getRole()).toBe('Manager');
+}); 

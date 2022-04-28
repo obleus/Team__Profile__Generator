@@ -23,3 +23,8 @@ test('test if we can get the email from the getEmail() method', () => {
 test('test if we can get the school name from the getSchool() method', () => {
     expect(intern.getSchool()).toBe('Florida');
 });
+
+
+test('test if we can get the role from the getRole() method', () => {
+    expect(intern.getRole()).toBe('Intern');
+}); 
