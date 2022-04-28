@@ -21,7 +21,6 @@ const generateTeam = (team) => {
         }
     }
 
-    // join the HTML blocks
     return html.join('');
 }
 
