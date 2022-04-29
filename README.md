@@ -8,3 +8,16 @@
 
 # Use
 ### After following the promt and answer all the questions a team.html file will be generated into the output folder
+
+# Screenshot
+
+###  <img width="1440" alt="Screen Shot 2022-04-29 at 1 43 39 AM" src="https://user-images.githubusercontent.com/94665725/165890560-3f76e942-1549-41f8-a453-0af578b01b52.png">
+
+
+
+
+
+
+
+# Video
+### https://drive.google.com/file/d/1GxEmx3gQd-JrV7vWdsp0CjRq2stc7MaY/view
